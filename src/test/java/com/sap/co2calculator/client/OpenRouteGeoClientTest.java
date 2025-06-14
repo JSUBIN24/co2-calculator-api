@@ -7,7 +7,6 @@ import com.sap.co2calculator.model.response.Geometry;
 import com.sap.co2calculator.model.response.Properties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
@@ -45,22 +44,7 @@ class OpenRouteGeoClientTest {
 
     @Test
     void shouldReturnCoordinatesForValidCity() {
-        // Arrange: Fake API JSON response
-        var json = """
-        {
-          "features": [
-            {
-              "geometry": {
-                "coordinates": [11.0775, 49.4491]
-              },
-              "properties": {
-                "label": "Nuremberg, Bavaria, Germany"
-              }
-            }
-          ]
-        }
-        """;
-
+        //Arrange
         GeoResponse mockResponse = new GeoResponse(List.of(
                 new Feature(
                         new Geometry(new double[]{11.0775, 49.4491}),
