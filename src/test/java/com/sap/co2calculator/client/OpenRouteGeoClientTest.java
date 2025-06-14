@@ -46,7 +46,7 @@ class OpenRouteGeoClientTest {
     void shouldReturnCoordinatesForValidCity() {
         //Arrange
         GeoResponse mockResponse = new GeoResponse(List.of(
-                new Feature(
+               [[]] new Feature(
                         new Geometry(new double[]{11.0775, 49.4491}),
                         new Properties("Nuremberg, Bavaria, Germany")
                 )
