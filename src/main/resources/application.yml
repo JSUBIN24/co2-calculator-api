@@ -1,0 +1,18 @@
+resilience4j:
+  retry:
+    geo-api:
+      max-attempts: 3
+      wait-duration: 1s
+    matrix-api:
+      max-attempts: 2
+      wait-duration: 2s
+
+  circuitbreaker:
+    geo-api:
+      sliding-window-size: 5
+      failure-rate-threshold: 50
+      wait-duration-in-open-state: 10s
+    matrix-api:
+      sliding-window-size: 5
+      failure-rate-threshold: 50
+      wait-duration-in-open-state: 10s
