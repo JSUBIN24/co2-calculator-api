@@ -1,0 +1,50 @@
+#!/bin/bash
+
+JAR_PATH="target/co2calculator-0.0.1-SNAPSHOT.jar"
+export ORS_TOKEN=5b3ce3597851110001cf62485c08d2ebd0c846c482dfd05a9835b9ed
+
+echo "=== Test 1: Valid input (success case) ==="
+java -jar $JAR_PATH --start="Hamburg" --end="Berlin" --transportation-method=diesel-car-medium
+echo -e "\n"
+
+echo "=== Test 2: Valid input with space format (success case) ==="
+java -jar $JAR_PATH --start "Hamburg" --end "Berlin" --transportation-method electric-car-large
+echo -e "\n"
+
+echo "=== Test 3: Reverse order of parameters (success case) ==="
+java -jar $JAR_PATH --transportation-method electric-car-medium --end "Berlin" --start "Hamburg"
+echo -e "\n"
+
+echo "=== Test 4: Invalid city name (start) ==="
+java -jar $JAR_PATH --start="InvalidCityXyz" --end="Berlin" --transportation-method=bus-default
+echo -e "\n"
+
+echo "=== Test 5: Invalid city name (end) ==="
+java -jar $JAR_PATH --start="Berlin" --end="InvalidCityAbc" --transportation-method=bus-default
+echo -e "\n"
+
+echo "=== Test 6: Invalid transportation method ==="
+java -jar $JAR_PATH --start="Berlin" --end="Hamburg" --transportation-method=rocket-fuel
+echo -e "\n"
+
+echo "=== Test 7: Missing argument (start) ==="
+java -jar $JAR_PATH --end="Berlin" --transportation-method=bus-default
+echo -e "\n"
+
+echo "=== Test 8: Missing argument (end) ==="
+java -jar $JAR_PATH --start="Berlin" --transportation-method=train-default
+echo -e "\n"
+
+echo "=== Test 9: Missing argument (transportation-method) ==="
+java -jar $JAR_PATH --start="Berlin" --end="Hamburg"
+echo -e "\n"
+
+echo "=== Test 10: Missing ORS_TOKEN ==="
+unset ORS_TOKEN
+java -jar $JAR_PATH --start="Berlin" --end="Hamburg" --transportation-method=diesel-car-small
+echo -e "\n"
+
+echo "=== Test 11: Ambiguous city name (e.g., Springfield) ==="
+export ORS_TOKEN=5b3ce3597851110001cf62485c08d2ebd0c846c482dfd05a9835b9ed 
+java -jar $JAR_PATH --start="Springfield" --end="Chicago" --transportation-method=bus-default
+echo -e "\n"

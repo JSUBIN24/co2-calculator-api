@@ -14,6 +14,14 @@ This project is a command-line Java Spring Boot application that calculates the 
 
 * Asks user to disambiguate the city name if multiple locations match
 
+* Rejects numeric or invalid city names.
+
+* Handle unreachable distance on road.
+
+* Introduce domain-specific custom Exception.
+
+* Ensure errors and edge-cases.
+
 * Uses environment variable for API key (ORS_TOKEN)
 
 * Logs all operations via SLF4J
@@ -25,7 +33,7 @@ This project is a command-line Java Spring Boot application that calculates the 
 
 * WebClient (non-blocking HTTP)
 
-* Resilience4j (Retry, CircuitBreaker)
+* Resilience4j (Retry, CircuitBreaker) (High level)
 
 * Lombok
 
@@ -36,21 +44,30 @@ This project is a command-line Java Spring Boot application that calculates the 
 # Setup & Run
 
 1. Run the application
+
+Step 1:
 Build and run with Maven:
 
 # Set environment variable in power shell
-$env:ORS_TOKEN="your-api-key-here"
+$env:ORS_TOKEN=<"Your-Api-Key-Here">
+$env:ORS_TOKEN="5b3ce3597851110001cf62485c08d2ebd0c846c482dfd05a9835b9ed"
+echo $env:ORS_TOKEN
 
 # Set environment variable in CMD
-set ORS_TOKEN=""your-api-key-here"
+set ORS_TOKEN=<Your-Api-Key-Here>
+set ORS_TOKEN=5b3ce3597851110001cf62485c08d2ebd0c846c482dfd05a9835b9ed
+echo %ORS_TOKEN%
 
 # Set environment variable in bash
+export ORS_TOKEN=<Your-Api-Key-Here>
 export ORS_TOKEN=5b3ce3597851110001cf62485c08d2ebd0c846c482dfd05a9835b9ed
+echo $ORS_TOKEN
 
-
+Step 2:
 #build
 mvn clean install
 
+Step 3:
 #Run the APP
 java -jar target/co2calculator-0.0.1-SNAPSHOT.jar --start="Hamburg" --end="Berlin" --transportation-method diesel-car-medium
 
@@ -60,33 +77,15 @@ java -jar target/co2calculator-0.0.1-SNAPSHOT.jar --end "New York" --start "Los 
 
 If multiple matches are found, you’ll be prompted to choose from the list.
 
-### Example Output
-
-Your trip caused 49.3kg of CO2-equivalent. 
-Supported Transportation Methods
-diesel-car-small
-
-petrol-car-medium
-
-plugin-hybrid-car-large
-
-electric-car-medium
-
-bus-default
-
-train-default
-
-Use one of the listed keys via --transportation-method.
-
 ### Testing
-To run unit tests:mvn test
+To run unit tests: mvn test
 
 Includes:
 
-* Unit tests for GeoService, EmissionService, and DistanceService
+* Unit tests for GeoService, EmissionService, DistanceService, OpenRoutGeoClient, OpenRouteMatrixClient, and co2calculator
 
 * WebClient mock tests for API clients
 
 * Exception fallback and failure flow tests
 
-Resilience4j Configuration (application.yml)
+* Resilience4j Configuration (application.yml)

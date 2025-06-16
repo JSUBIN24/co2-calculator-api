@@ -1,6 +1,6 @@
 package com.sap.co2calculator.client;
 
-import com.sap.co2calculator.exception.MatrixProfileException;
+import com.sap.co2calculator.exception.OrsClientException;
 import com.sap.co2calculator.model.Coordinates;
 import com.sap.co2calculator.model.response.MatrixResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,7 +38,7 @@ class OpenRouteMatrixClientTest {
         when(builder.defaultHeader(anyString(), anyString())).thenReturn(builder);
         when(builder.build()).thenReturn(webClient);
 
-        matrixClient = new OpenRouteMatrixClient("5b3ce3597851110001cf62485c08d2ebd0c846c482dfd05a9835b9ed");
+        matrixClient = new OpenRouteMatrixClient("5b3ce3597851110001cf62485c08d2ebd0c846c482dfd05a9835b9ed","https://api.openrouteservice.org/v2/matrix/", "driving-car");
     }
 
     @Test
@@ -51,14 +51,11 @@ class OpenRouteMatrixClientTest {
                 List.of(0.0, 432000.0)
         ));
 
+        // Act
         when(webClient.post()).thenReturn(uriSpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.bodyToMono(MatrixResponse.class)).thenReturn(Mono.just(response));
-
-
-        // Act
         double result = matrixClient.getDistanceInKm(from, to);
-        System.out.println("result = " + result);
 
         // Assert
         assertEquals(445.8, result);
@@ -67,23 +64,28 @@ class OpenRouteMatrixClientTest {
 
     @Test
     void shouldThrowMatrixProfileException_whenResponseIsNull() {
+        //Arrange
         Coordinates from = new Coordinates(1.0, 2.0);
         Coordinates to = new Coordinates(3.0, 4.0);
 
+        //Act
         when(webClient.post()).thenReturn(uriSpec);
         when(requestBodySpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.bodyToMono(MatrixResponse.class)).thenReturn(Mono.empty());
 
-        assertThrows(NullPointerException.class, () -> matrixClient.getDistanceInKm(from, to));
+        //Assert
+        assertThrows(OrsClientException.class, () -> matrixClient.getDistanceInKm(from, to));
     }
 
     @Test
     void fallbackDistance_shouldThrowMatrixProfileException() {
+        //Arrange
         Coordinates from = new Coordinates(1.0, 2.0);
         Coordinates to = new Coordinates(3.0, 4.0);
-        Throwable cause = new RuntimeException("Simulated failure");
+        Throwable cause = new OrsClientException("Simulated failure");
 
-        MatrixProfileException exception = assertThrows(MatrixProfileException.class, () -> {
+        //Act & Assert
+        OrsClientException exception = assertThrows(OrsClientException.class, () -> {
             matrixClient.fallbackGetDistanceInKm(from, to, cause);
         });
 

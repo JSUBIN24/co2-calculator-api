@@ -1,7 +1,7 @@
 package com.sap.co2calculator.client;
 
 import com.sap.co2calculator.config.AppConst;
-import com.sap.co2calculator.exception.MatrixProfileException;
+import com.sap.co2calculator.exception.OrsClientException;
 import com.sap.co2calculator.model.Coordinates;
 import com.sap.co2calculator.model.request.MatrixRequest;
 import com.sap.co2calculator.model.response.MatrixResponse;
@@ -23,9 +23,10 @@ public class OpenRouteMatrixClient {
 
     private final WebClient webClient;
 
-    public OpenRouteMatrixClient(@Value("${ors.token}") String token) {
+    public OpenRouteMatrixClient(@Value("${ors.token}") String token, @Value("${ors.base.url.matrix}") String urlPrefix ,@Value ("${ors.base.url.profile}") String urlSuffix) {
+        String orsMatrixUrl = Objects.requireNonNull(urlPrefix) + Objects.requireNonNull(urlSuffix);
         this.webClient = WebClient.builder()
-                .baseUrl(AppConst.ORS_BASE_URL_MATRIC)
+                .baseUrl(orsMatrixUrl)
                 .defaultHeader(AppConst.AUTHORIZATION, token)
                 .build();
     }
@@ -43,22 +44,25 @@ public class OpenRouteMatrixClient {
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(MatrixResponse.class)
-                .block();
+                .blockOptional()
+                        .orElseThrow(() -> new OrsClientException(AppConst.ORS_API_IS_NULL_OR_EMPTY));
 
-      /*  if (response ==  null || response.distances()  == null || response.distances().isEmpty()){
-            throw new IllegalStateException("Distance response from ORS API is null or empty");
-        }*/
+        if (response.distances()  == null || response.distances().isEmpty() || response.distances().getFirst() == null || response.distances().getFirst().size() < 2){
+            throw new IllegalStateException("Invalid distance matrix structure from ORS");
+        }
 
-        Objects.requireNonNull(response, AppConst.ORS_API_IS_NULL_OR_EMPTY);
-        Objects.requireNonNull(response.distances(), AppConst.DISTANCE_MATRIX_IS_MISSING);
+        Double rawKm = response.distances().getFirst().get(1);
 
-        double rawKm = response.distances().getFirst().get(1) / 1000.0;
+        if (rawKm == null){
+            log.error("No drivable route found between selected cities");
+            throw new OrsClientException("No drivable route found between selected cities");
+        }
 
-        return BigDecimal.valueOf(rawKm).setScale(1, RoundingMode.HALF_UP).doubleValue();
+        return BigDecimal.valueOf(rawKm/1000.0).setScale(1, RoundingMode.HALF_UP).doubleValue();
     }
 
     public double fallbackGetDistanceInKm(Coordinates from, Coordinates to, Throwable throwable) {
         log.error("Fallback for matrix API: {}", throwable.getMessage());
-        throw new MatrixProfileException("Matrix API failed and fallback was triggered.", throwable);
+        throw new OrsClientException("Matrix API failed and fallback was triggered.", throwable);
     }
 }

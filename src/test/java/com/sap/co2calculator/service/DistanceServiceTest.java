@@ -1,8 +1,7 @@
 package com.sap.co2calculator.service;
 
-import com.sap.co2calculator.client.OpenRouteGeoClient;
 import com.sap.co2calculator.client.OpenRouteMatrixClient;
-import com.sap.co2calculator.exception.MatrixProfileException;
+import com.sap.co2calculator.exception.OrsClientException;
 import com.sap.co2calculator.model.Coordinates;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -12,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -92,16 +91,18 @@ class DistanceServiceTest {
 
 
     @Test
-    void shouldThrowMatrixProfileException_whenMatrixClientFails(){
+    void shouldThrowORSClientException_whenMatrixClientFails(){
 
         //Act
-        when(openRouteMatrixClient.getDistanceInKm(from,to)).thenThrow(new RuntimeException("Error occurred during matrix profile"));
+        when(openRouteMatrixClient.getDistanceInKm(from,to)).thenThrow(new RuntimeException("Error occurred while calling the matrix API"));
 
         //Assert
         assertThatThrownBy(()-> distanceService.getDistanceInKm(from,to))
-                .isInstanceOfAny(MatrixProfileException.class)
+                .isInstanceOf(OrsClientException.class)
                 .hasMessageContaining("Matrix failed for coordinated from : " + from + " to : " + to)
                 .hasCauseInstanceOf(RuntimeException.class);
+
+        verify(openRouteMatrixClient,times(1)).getDistanceInKm(from,to);
     }
 
 }

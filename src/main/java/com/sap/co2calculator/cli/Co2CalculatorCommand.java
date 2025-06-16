@@ -8,13 +8,15 @@ import com.sap.co2calculator.model.TransportationMethod;
 import com.sap.co2calculator.service.DistanceService;
 import com.sap.co2calculator.service.EmissionService;
 import com.sap.co2calculator.service.GeoService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
 
 @Component
 @Slf4j
@@ -55,6 +57,7 @@ public class Co2CalculatorCommand implements CommandLineRunner {
 
         } catch (Exception ex) {
             log.error("Error occurred during calculation: {}" ,ex.getMessage());
+            throw  ex;
         }
     }
 
@@ -64,7 +67,7 @@ public class Co2CalculatorCommand implements CommandLineRunner {
 
         if (candidates.isEmpty()){
             log.error("No matching location found for: {}" ,cityName);
-            System.exit(1);
+            throw new RuntimeException(String.format("No matching location found for: %s", cityName));
         }
 
         if(candidates.size() ==1){
@@ -82,7 +85,7 @@ public class Co2CalculatorCommand implements CommandLineRunner {
 
         if (selection < 1 || selection > candidates.size()) {
             log.error(" Invalid selection.");
-            System.exit(1);
+            throw new IllegalArgumentException("Invalid selection");
         }
 
         return candidates.get(selection - 1).coordinates();

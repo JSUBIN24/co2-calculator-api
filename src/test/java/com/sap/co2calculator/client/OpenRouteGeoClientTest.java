@@ -39,7 +39,7 @@ class OpenRouteGeoClientTest {
         when(builder.defaultHeader(anyString(), anyString())).thenReturn(builder);
         when(builder.build()).thenReturn(webClient);
 
-        geoClient = new OpenRouteGeoClient("5b3ce3597851110001cf62485c08d2ebd0c846c482dfd05a9835b9ed");
+        geoClient = new OpenRouteGeoClient("5b3ce3597851110001cf62485c08d2ebd0c846c482dfd05a9835b9ed","https://api.openrouteservice.org/geocode/search");
     }
 
     @Test
@@ -52,13 +52,11 @@ class OpenRouteGeoClientTest {
                 )
         ));
 
-        // Mock WebClient behavior
+        //Act
         when(webClient.get()).thenReturn((WebClient.RequestHeadersUriSpec)uriSpec);
         when(uriSpec.uri(any(Function.class))).thenReturn(headersSpec);
         when(headersSpec.retrieve()).thenReturn(responseSpec);
         when(responseSpec.bodyToMono(GeoResponse.class)).thenReturn(Mono.just(mockResponse));
-
-        // Act
         List<NamedLocation> results = geoClient.getAllCoordinates("Nuremberg");
 
         // Assert

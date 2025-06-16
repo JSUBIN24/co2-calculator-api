@@ -21,9 +21,9 @@ public class OpenRouteGeoClient {
 
     private final WebClient webClient;
 
-    public OpenRouteGeoClient(@Value("${ors.token}") String token) {
+    public OpenRouteGeoClient(@Value("${ors.token}") String token,   @Value("${ors.base.url.geocode}") String orsGeocodeUrl) {
         this.webClient = WebClient.builder()
-                .baseUrl(AppConst.ORL_BASE_URL_GEOCODE)
+                .baseUrl(orsGeocodeUrl)
                 .defaultHeader(AppConst.AUTHORIZATION, token)
                 .build();
     }
@@ -51,7 +51,6 @@ public class OpenRouteGeoClient {
             }
         }
 
-        System.out.println("results = " + results);
         return results;
 
     }
