@@ -16,7 +16,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -178,7 +177,6 @@ class Co2CalculatorCommandTest {
 
         Coordinates berlin1 = new Coordinates(13.0, 52.0);
         Coordinates berlin2 = new Coordinates(13.5, 52.5);
-        Coordinates paris = new Coordinates(2.3522, 48.8566);
 
         // Act & Assert
         when(geoService.getCandidateLocations("Berlin")).thenReturn(List.of(

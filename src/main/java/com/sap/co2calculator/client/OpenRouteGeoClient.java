@@ -56,7 +56,7 @@ public class OpenRouteGeoClient {
     }
 
     public List<NamedLocation> fallbackGetCoordinates(String city, Throwable throwable) {
-        log.error("Fallback method for get all coordinates for city: {}" , throwable.getMessage());
+        log.error("Fallback method for get all coordinates for city: {} and message: {}" , city, throwable.getMessage());
         return  List.of();
     }
 }
